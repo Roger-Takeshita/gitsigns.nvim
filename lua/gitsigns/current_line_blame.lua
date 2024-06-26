@@ -210,6 +210,10 @@ local update = async.create(1, debounce.throttle_by_id(update0))
 M.update = nil
 
 function M.setup()
+  local group = api.nvim_create_augroup('gitsigns_blame', {})
+  local opts = config.current_line_blame_opts
+  M.update = debounce.debounce_trailing(opts.delay, update)
+
   for k in pairs(cache) do
     reset(k)
   end
@@ -217,10 +221,6 @@ function M.setup()
   if not config.current_line_blame then
     return
   end
-
-  local group = api.nvim_create_augroup('gitsigns_blame', {})
-  local opts = config.current_line_blame_opts
-  M.update = debounce.debounce_trailing(opts.delay, update)
 
   local events = { 'FocusGained', 'BufEnter', 'CursorMoved', 'CursorMovedI' }
   if vim.fn.exists('#WinResized') == 1 then
